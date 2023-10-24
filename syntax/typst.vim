@@ -293,7 +293,7 @@ syntax match typstMarkupItalic
 syntax region typstMarkupItalicRegion
     \ contained
     \ matchgroup=typstMarkupItalicDelimiter 
-    \ start=/\(^\|[^0-9a-zA-Z]\)\@<=_/ end=/_\($\|[^0-9a-zA-Z]\)\@=/
+    \ start=/\(^\|[^0-9a-zA-Z]\)\@<=_/ skip=/\\_/ end=/_\($\|[^0-9a-zA-Z]\)\@=/
     \ concealends contains=typstMarkupLabel,typstMarkupBold,@Spell
 " syntax match typstMarkupBoldError
 "     \ /\v(\w|\\)@<!\*\S@=.*|.*\S@<=\\@<!\*/
@@ -303,7 +303,7 @@ syntax match typstMarkupBold
 syntax region typstMarkupBoldRegion
     \ contained
     \ matchgroup=typstMarkupBoldDelimiter 
-    \ start=/\(^\|[^0-9a-zA-Z]\)\@<=\*/ end=/\*\($\|[^0-9a-zA-Z]\)\@=/
+    \ start=/\(^\|[^0-9a-zA-Z]\)\@<=\*/ skip=/\\\*/ end=/\*\($\|[^0-9a-zA-Z]\)\@=/
     \ concealends contains=typstMarkupLabel,typstMarkupBold,@Spell
 syntax match typstMarkupLinebreak
     \ /\\\\/
