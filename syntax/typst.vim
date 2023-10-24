@@ -242,7 +242,7 @@ syntax cluster typstMarkupText
             \ ,typstMarkupBulletList
             \ ,typstMarkupEnumList
             \ ,typstMarkupBold
-            \ ,typstMarkupItalic
+            \ ,typstMarkupItalicRegion
             \ ,typstMarkupLinebreak
             \ ,typstMarkupNonbreakingSpace
             \ ,typstMarkupShy
@@ -287,14 +287,14 @@ syntax match typstMarkupEnumList
     \ /\v^\s*(\+|\d+\.)\s+/
 " syntax match typstMarkupItalicError
 "     \ /\v(\w|\\)@<!_\S@=.*|.*\S@<=\\@<!_/
-syntax match typstMarkupItalic
-    \ /\v(\w|\\)@<!_\S@=.*(\n.+)*\S@<=\\@<!_/
-    \ contains=typstMarkupItalicRegion
+" syntax match typstMarkupItalic
+    " \ /\v(\w|\\)@<!_\S@=.*(\n.+)*\S@<=\\@<!_/
+    " \ contains=typstMarkupItalicRegion
 syntax region typstMarkupItalicRegion
-    \ contained
     \ matchgroup=typstMarkupItalicDelimiter 
     \ start=/\(^\|[^0-9a-zA-Z]\)\@<=_/ end=/_\($\|[^0-9a-zA-Z]\)\@=/
     \ concealends contains=typstMarkupLabel,typstMarkupBold,@Spell
+    " \ contained
 " syntax match typstMarkupBoldError
 "     \ /\v(\w|\\)@<!\*\S@=.*|.*\S@<=\\@<!\*/
 syntax match typstMarkupBold
