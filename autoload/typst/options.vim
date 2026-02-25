@@ -7,6 +7,7 @@ function! typst#options#init() abort " {{{1
     call s:declare_option('typst_syntax_highlight', 1)
     call s:declare_option('typst_cmd', 'typst')
     call s:declare_option('typst_pdf_viewer', '')
+    call s:declare_option('typst_output_to_tmp', 0)
     call s:declare_option('typst_conceal', 0)
     call s:declare_option('typst_conceal_math', g:typst_conceal)
     call s:declare_option('typst_conceal_emoji', g:typst_conceal)
@@ -14,6 +15,8 @@ function! typst#options#init() abort " {{{1
     call s:declare_option('typst_auto_close_toc', 0)
     call s:declare_option('typst_auto_open_quickfix', 1)
     call s:declare_option('typst_embedded_languages', [])
+    call s:declare_option('typst_folding', 0)
+    call s:declare_option('typst_foldnested', 1)
 
     let s:initialized = v:true
 endfunction " }}}1

@@ -7,10 +7,29 @@ function! typst#TypstWatch(...)
         \ . ' watch'
         \ . ' ' . join(a:000)
         \ . ' --diagnostic-format short'
-        \ . " \"" . expand('%') . "\""
+        \ . " '" . expand('%') . "'"
+
+    " Add custom output directory if enabled
+    if g:typst_output_to_tmp
+        let l:file_path = expand('%:p')
+        let l:home_dir = expand('$HOME')
+        " Remove HOME directory prefix if present
+        if l:file_path =~# '^' . l:home_dir
+            let l:relative_path = substitute(l:file_path, '^' . l:home_dir . '/', '', '')
+        else
+            let l:relative_path = l:file_path
+        endif
+        " Strip .typ or .typst extension before adding .pdf
+        let l:relative_path = substitute(l:relative_path, '\.\(typ\|typst\)$', '', '')
+        let l:output_path = '/tmp/typst_out/' . l:relative_path . '.pdf'
+        " Create output directory if it doesn't exist
+        let l:output_dir = fnamemodify(l:output_path, ':h')
+        call mkdir(l:output_dir, 'p')
+        let l:cmd = l:cmd . ' "' . l:output_path . '"'
+    endif
 
     if !empty(g:typst_pdf_viewer)
-        let l:cmd = l:cmd . ' --open ' . g:typst_pdf_viewer 
+        let l:cmd = l:cmd . ' --open ' . g:typst_pdf_viewer
     else
         let l:cmd = l:cmd . ' --open'
     endif
@@ -63,7 +82,7 @@ function! typst#TypstWatcherCb(channel, content, ...)
     endfor
     call setqflist(l:errors)
     if g:typst_auto_open_quickfix
-        execute empty(l:errors) ? 'cclose' : 'copen'
+        execute empty(l:errors) ? 'cclose' : 'copen | wincmd p'
     endif
 endfunction
 
@@ -288,4 +307,30 @@ function! typst#in_comment(...) abort
             \ || l:name =~? '^typstComment'
     endfor
     return l:ret
+endfunction
+
+
+function! typst#foldexpr()
+    let line = getline(v:lnum)
+
+    " Whenever the user wants to fold nested headers under the parent
+    let nested = g:typst_folding
+
+    " Regular headers
+    let depth = match(line, '\(^=\+\)\@<=\( .*$\)\@=')
+
+    " Do not fold nested regular headers
+    if depth > 1 && !nested
+        let depth = 1
+    endif
+
+    if depth > 0
+        " check syntax, it should be typstMarkupHeading
+        let syncode = synstack(v:lnum, 1)
+        if len(syncode) > 0 && synIDattr(syncode[0], 'name') ==# 'typstMarkupHeading'
+            return ">" . depth
+        endif
+    endif
+
+    return "="
 endfunction

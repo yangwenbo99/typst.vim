@@ -12,19 +12,57 @@ compiler typst
 " " If you're on typst <v0.8, workaround for https://github.com/typst/typst/issues/1937
 " set errorformat^=\/%f:%l:%c:%m
 
-setlocal expandtab
-setlocal tabstop=8
-setlocal softtabstop=2
-setlocal shiftwidth=2
+if !exists("g:typst_recommended_style") || g:typst_recommended_style != 0
+    setlocal expandtab
+    setlocal tabstop=8
+    setlocal softtabstop=2
+    setlocal shiftwidth=2
+endif
+
+if g:typst_folding
+    setlocal foldexpr=typst#foldexpr()
+    setlocal foldmethod=expr
+    if !exists("b:undo_ftplugin")
+        let b:undo_ftplugin = ""
+    endif
+    let b:undo_ftplugin .= "|setl foldexpr< foldmethod<"
+endif
 
 if g:typst_conceal
     setlocal conceallevel=2
 endif
 
+if g:typst_syntax_use_lsp && g:typst_conceal
+    lua << EOF 
+    vim.api.nvim_create_autocmd('LspTokenUpdate', {
+        callback = function(args)
+            local token = args.data.token
+            if token.type == 'punct' then
+                local conceal = ''
+                local should_conceal = false
+                if token.modifiers.strong or token.modifiers.emph then
+                    should_conceal = true
+                end
+                if should_conceal then
+                    vim.api.nvim_buf_set_extmark(
+                        args.buf, args.data.client_id, token.line, token.start_col, {
+                        end_col = token.end_col,
+                        conceal = '',
+                        priority = vim.highlight.priorities.semantic_tokens + 1,
+                    })
+                end
+            end
+        end
+    })
+EOF
+endif
+
 setlocal commentstring=//\ %s
 setlocal comments=s1:/*,mb:*,ex:*/,://
 
-setlocal formatoptions+=croq
+setlocal formatoptions+=croqn
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal formatlistpat+=\\\|^\\s*[-+\]\\s\\+
 
 if has('win32')
     setlocal iskeyword=a-z,A-Z,48-57,_,-,128-167,224-235

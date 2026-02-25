@@ -75,6 +75,9 @@ call plug#end()
 - `g:typst_pdf_viewer`:
     Specifies pdf viewer that `typst watch --open` will use.
     *Default:* `''`
+- `g:typst_output_to_tmp`:
+    Redirect compiled PDFs to `/tmp/typst_out/` followed by the file's path relative to `$HOME`.
+    *Default:* `0`
 - `g:typst_conceal`:
     Enable concealment.
     *Default:* `0`
@@ -94,12 +97,41 @@ call plug#end()
     *Default:* `1`
 - `g:typst_embedded_languages`:
     A list of languages that will be highlighted in code blocks. Typst is always highlighted.
+    If language name is different from the syntax file name, you can use renaming, e.g. `'rs -> rust'`
+    (spaces around the arrow are mandatory).
     *Default:* `[]`
+- `g:typst_folding`:
+    Enable folding for typst heading
+    *Default:* `0`
+- `g:typst_foldnested`:
+    Enable nested foldings
+    *Default:* `1`
 
 ### Commands
 
 - `:TypstWatch`:
     Watches your document and recompiles on change; also opens the document with your default pdf viewer.
+
+### Scripting
+
+- `typst#synstack(kwargs)`:
+    Detects the inner most syntax group under the cursor by default.
+    **Arguments.** Accepts a single argument `kwargs` of dictionary type that can include the following keys (with defaults).
+    *pos:* `getcurpos()[1:3]`.
+    *only_inner:* `v:true`.
+    **Note.** Does not work with treesitter enabled, see [#117].
+- `typst#in_markup(...)`:
+    Returns true if syntax under the cursor is in "markup" mode.
+    **Arguments.** Passes all arguments to `typst#synstack`.
+- `typst#in_code(...)`:
+    Returns true if syntax under the cursor is in "code" mode.
+    **Arguments.** Passes all arguments to `typst#synstack`.
+- `typst#in_math(...)`:
+    Returns true if syntax under the cursor is in "math" mode.
+    **Arguments.** Passes all arguments to `typst#synstack`.
+- `typst#in_comment(...)`:
+    Returns true if syntax under the cursor is a comment.
+    **Arguments.** Passes all arguments to `typst#synstack`.
 
 ## Tips
 
@@ -108,4 +140,6 @@ There exist a server configuration in `nvim-lspconfig` so it should be easy to s
 config currently requires that you're working in a git repo. Once the neovim+LSP recognizes
 the file the LSP will compile your document while you write (almost like a wysiwyg!). By default
 it will compile on save but you can set it to compile-on-write as well.
+
+[#117]: https://github.com/kaarmu/typst.vim/issues/117
 
